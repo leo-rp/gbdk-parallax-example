@@ -138,9 +138,9 @@ const unsigned char background_tile_data[] ={
   0xFF,0xFF,0x00,0x00,0xFF,0x00,0xFF,0x00,0xFF,0x00,0xFF,0xFF,0x00,0xFF,0x00,0xFF
 };
 
-unsigned char fx2[] = {
+unsigned char wave[] = {
 	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-    0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,
+    	0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,
 	0x02,0x02,0x02,0x02,0x02,0x02,0x02,0x02,
 	0x03,0x03,0x03,0x03,0x03,0x03,0x03,0x03,
 	0x04,0x04,0x04,0x04,0x04,0x04,0x04,0x04,
@@ -158,25 +158,23 @@ UBYTE ix, iy, counter, offset;
 UINT16 p1, p2;
 
 
-void LCD_Interrupt(void){    
-	
+void LCD_Interrupt(void){   
+
 	if( LY_REG < 90u){ 
 		SCX_REG = p2 >> 2;
-		SCY_REG = fx2[counter] >> 1;
-		//SCY_REG 
+		SCY_REG = wave[counter] >> 1;
+
 	}
-		
+
 	if( (LY_REG < 100u) && (LY_REG > 96u) ){ 
 		SCX_REG=p2;
 		SCY_REG = 0;		
 	}
-		
+
 	if(LY_REG >  120u){
 		SCX_REG= p1;
 		SCY_REG = 0;
 	}
-	
-
 }
 
 void VBL_Interrupt(void){
@@ -191,35 +189,26 @@ void VBL_Interrupt(void){
 
 void main(void) {
     
-    HIDE_SPRITES;
-    HIDE_BKG;
-    STAT_REG = 8;
-    
-    disable_interrupts();
-    add_LCD(LCD_Interrupt);
+	HIDE_SPRITES;
+	HIDE_BKG;
+	STAT_REG = 8;
+
+	disable_interrupts();
+	add_LCD(LCD_Interrupt);
 	add_VBL(VBL_Interrupt); 
-    enable_interrupts();
-    
-    /*// set background
-    set_bkg_data(0, 0, tiles);
-    
-	for (ix = 0; ix != 31; ix += 7) {
-        for (iy = 0; iy != 21; iy += 7) {
-            set_bkg_tiles(ix, iy, 7, 7, map);
-        }
-    }*/
-	 counter =0;
-	//(*(__REG)0xFF47) = $10011100; //bg pal
+	enable_interrupts();    
+
+	counter = 0;
+
 	set_bkg_data(0, 0x51, &background_tile_data);	
 	set_bkg_tiles(0, 0, 32, 18, &background_map_data);	
-    
-    set_interrupts(LCD_IFLAG | VBL_IFLAG );
-    
-    SHOW_BKG;
-    SHOW_SPRITES;
-    
-    while(1){
-		wait_vbl_done();
-		}
 
+	set_interrupts(LCD_IFLAG | VBL_IFLAG );
+
+	SHOW_BKG;
+	SHOW_SPRITES;
+    
+    	while(1){
+		wait_vbl_done();
+	}
 }
